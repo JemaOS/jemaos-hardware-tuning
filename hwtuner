@@ -1,0 +1,49 @@
+#!/bin/bash
+# Copyright 2021 The JemaOS Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+# Author: Yang Tsao<yang@jemaos.io>
+
+declare RealPath=$0
+if [ -h $0 ]; then
+  RealPath=$(readlink $RealPath)
+fi
+source $(dirname $RealPath)/lib/importlib.sh
+
+if [ "$production" == "debug" ]; then
+  DEBUG_MODE=true
+fi
+
+if [[ "$1" = "--info" ]]; then
+  COLOR="false"
+fi
+
+import_libs format_color array_util console
+
+import_libs root
+
+root_show_help() {
+  echo "main help"
+}
+
+version_suffix() {
+  local f=""
+  f="$(dirname "$RealPath")/.version_suffix"
+  if [[ -f "$f" ]]; then
+    cut -c1-8 "$f" 2> /dev/null
+  else
+    echo "N"
+  fi
+}
+
+main() {
+  set_appname "JemaOS Hardware Tuner"
+  set_appversion 0 0 1 "$(version_suffix)"
+  if [[ "$1" = "--info" ]]; then
+    root_display_all
+    exit 0
+  fi
+  register_console root
+}
+
+main $@
