@@ -1,42 +1,46 @@
 #!/bin/bash
-# Copyright 2021 The JemaOS Authors. All rights reserved.
+# Copyright 2025 Jema Technology. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
-# Author: Yang Tsao<yang@jemaos.io>
 
 import_libs input_util gesture_conf_util
 
+# Function to initialize and show the gesture menu
 init_gesture_and_show() {
   set_current_gesture_device "$1"
   set_current_input_device "$1"
   register_console gesture
 }
 
+# Function to initialize the gesture configuration
 gesture_console_in() {
   init_gesture_config 
   insert_driver_gesture_base
 }
 
+# Function to handle exiting the gesture console
 gesture_console_out() {
   local answer
-  read -n 1 -p "Would you like to save your gesture configration to the system? Press [y] for yes, others to skip:" answer
-  if [ "$answer" == "y" ];then
+  read -n 1 -p "Would you like to save your gesture configuration to the system? Press [y] for yes, others to skip:" answer
+  if [ "$answer" == "y" ]; then
     echo ""
     if [ $(save_gesture_config) -eq 0 ]; then
-      OkMsg "Reboot or restart UI to reload the gesture configrations."
+      OkMsg "Reboot or restart UI to reload the gesture configurations."
     else
       WarnMsg "Nothing has changed."
     fi
   fi
 }
 
+# Function to edit a specific gesture option
 edit_gesture_option() {
   local option="$1"
-  read -p "Please input the value for the option \"$option\", an empty value will remove the option from configration:" value
+  read -p "Please input the value for the option \"$option\", an empty value will remove the option from configuration:" value
   edit_option_of_gesture "$option" "$value"
   show_menu
 }
 
+# Function to manually edit a gesture option
 edit_gesture_manually() {
   local option
   read -p "Input the Option caption:" option
@@ -48,6 +52,7 @@ edit_gesture_manually() {
   fi
 }
 
+# Function to list gesture configuration information
 gesture_list_info() {
   local event_dev="$(input_device_event_dev)"
 
@@ -63,6 +68,7 @@ gesture_list_info() {
   get_gesture_config_from_tmp
 }
 
+# Function to show the gesture menu
 gesture_show_menu() {
   local -A combarray
   local option keys
@@ -92,6 +98,7 @@ gesture_show_menu() {
     "Add new option"
 }
 
+# Function to show help for gesture configuration
 gesture_show_help() {
-  echo "Reference url: [https://www.x.org/releases/current/doc/man/man5/xorg.conf.5.xhtml#heading9]" 
+  echo "Reference URL: [https://www.x.org/releases/current/doc/man/man5/xorg.conf.5.xhtml#heading9]" 
 }

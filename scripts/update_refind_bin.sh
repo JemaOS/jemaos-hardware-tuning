@@ -1,24 +1,30 @@
 #!/usr/bin/env bash
 
+# Exit immediately if a command exits with a non-zero status
 set -o errexit
 
+# Constants for EFI partition type and rEFInd configuration
 declare -r EFI_PARTTYPE="c12a7328-f81f-11d2-ba4b-00a0c93ec93b"
 declare -r JEMAOS_DUALLBOOT_FINGERPRINT=".jemaos_dualboot"
 declare -r SUBDIR_IN_EFI="EFI"
 declare -r REFIND_DIR_IN_EFI="refind"
 declare -r REFIND_BAK_FILE="refind.backup.tar.gz"
 
+# Flag for user interaction
 declare USER_INTERACTION="true"
 
+# Function to log a fatal error and exit
 fatal() {
   log "$@"
   exit 1
 }
 
+# Function to log a message to stderr
 log() {
   echo "$@" >&2
 }
 
+# Function to validate if the directory contains JemaOS rEFInd files
 assert_jemaos_refind() {
   local dir="$1"
   local subdirs=("jemaos" "$REFIND_DIR_IN_EFI")
@@ -37,6 +43,7 @@ assert_jemaos_refind() {
   return 0
 }
 
+# Function to back up the current rEFInd configuration
 backup_refind() {
   local dir="$1"
   local bak_file="${dir}/${SUBDIR_IN_EFI}/${REFIND_BAK_FILE}"
@@ -49,6 +56,7 @@ backup_refind() {
   log "Backup rEFInd to $bak_file"
 }
 
+# Function to extract the rEFInd archive
 extract_refind() {
   local file="$1"
   local temp_dir="$2"
@@ -60,6 +68,7 @@ extract_refind() {
   log "Extracted rEFInd file ${file} to ${temp_dir}/${REFIND_DIR_IN_EFI}"
 }
 
+# Function to get the rEFInd version from a directory
 get_refind_version_in_dir() {
   local dir="$1"
   local version_file="$dir/.version"
@@ -70,6 +79,7 @@ get_refind_version_in_dir() {
   fi
 }
 
+# Function to copy rEFInd files to the target directory
 copy_refind() {
   local action="$1"
   local dir="$2"
@@ -100,6 +110,7 @@ copy_refind() {
   log "Copied rEFInd, ${target}${REFIND_DIR_IN_EFI}($v2) was replaced by ${temp_refind_dir}($v1)"
 }
 
+# Function to prompt the user for confirmation
 user_continue() {
   if [[ "$USER_INTERACTION" = "false" ]]; then
     return 0
@@ -117,6 +128,7 @@ user_continue() {
   done
 }
 
+# Function to unmount a partition
 umount_partition() {
   local part="$1"
   local dir="$2"
@@ -125,6 +137,7 @@ umount_partition() {
   fi
 }
 
+# Function to update rEFInd after mounting a partition
 update_refind_after_mounted() {
   local part="$1"
   local dir="$2"
@@ -137,6 +150,7 @@ update_refind_after_mounted() {
   copy_refind "update" "$dir" "$file" || { log "Failed to update rEFInd in $part"; return 1; }
 }
 
+# Function to restore rEFInd after mounting a partition
 restore_refind_after_mounted() {
   local part="$1"
   local dir="$2"
@@ -153,6 +167,7 @@ restore_refind_after_mounted() {
   copy_refind "restore" "$dir" "$backup_file" || { log "Failed to restore rEFInd in $part"; return 1; }
 }
 
+# Function to update or restore rEFInd in a partition
 update_refind_in_partition() {
   local action="$1"
   local part="$2"
@@ -186,6 +201,7 @@ update_refind_in_partition() {
   return $ret
 }
 
+# Function to display usage instructions
 usage() {
   echo "Usage: $0 [-f refind_file] [-r] [-y]"
   echo "  -f refind_file: the rEFInd file to update"
@@ -194,6 +210,7 @@ usage() {
   exit 1
 }
 
+# Main function to handle the update or restore process
 main() {
   local refind_file=""
   local action=""

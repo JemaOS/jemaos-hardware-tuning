@@ -1,25 +1,27 @@
 #!/bin/bash
-# Copyright 2021 The JemaOS Authors. All rights reserved.
+# Copyright 2025 Jema Technology. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
-# Author: Yang Tsao<yang@jemaos.io>
 
 import_libs bus_pci_scan graphic_device kernel_module_util module_param
 
+# Function to list graphic PCI device information
 list_graphic_pci_info() {
   echo "System graphic device list:"
   for slot in $(get_slots_by_pci_types "graphic" "display"); do
     pci_device_info $slot
   done
-  WarnMsg "Suggestions from jemaos:"
-  echo "Best compatiable devices:" ${_BEST_COMPATIABLE_GCARDS[@]}  
-  echo "Basic compatiable devices:" ${_BASIC_COMPATIABLE_GCARDS[@]}
+  WarnMsg "Suggestions from JemaOS:"
+  echo "Best compatible devices:" ${_BEST_COMPATIABLE_GCARDS[@]}  
+  echo "Basic compatible devices:" ${_BASIC_COMPATIABLE_GCARDS[@]}
 }
 
+# Function to display graphic device information
 graphic_list_info() {
   list_graphic_pci_info
 }
 
+# Function to show the graphic menu
 graphic_show_menu() {
   graphic_list_info
   print_line "*"
@@ -37,6 +39,7 @@ graphic_show_menu() {
     "Search kernel message for graphic driver error"
 }
 
+# Function to display help for graphic configuration
 graphic_show_help() {
   echo "JemaOS can only run on one graphic device at the moment. If there are two or more graphic devices in your system,\
      JemaOS may pick one randomly. You need to block the unused device or the system will not run stably."

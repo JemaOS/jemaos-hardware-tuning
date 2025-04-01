@@ -1,20 +1,21 @@
 #!/bin/bash
-# Copyright 2022 The JemaOS Authors. All rights reserved.
+# Copyright 2025 Jema Technology. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-# Author: fangzhou@jemaos.io
-
 import_libs alt_touchpad_cmt_util
 
+# Function to initialize and show the alternative touchpad CMT menu
 init_alt_touchpad_cmt_and_show() {
   register_console alt_touchpad_cmt 
 }
 
+# Function to initialize the alternative touchpad CMT configuration
 alt_touchpad_cmt_console_in() {
   init_alt_touchpad_cmt_conf
 }
 
+# Function to use a specific alternative touchpad configuration
 use_alt_touchpad_config() {
   local option="$1"
   if [ "$option" -eq 0 ]; then
@@ -28,6 +29,7 @@ use_alt_touchpad_config() {
   done
 }
 
+# Function to describe the alternative touchpad configuration
 alt_touchpad_cmt_config_desc() {
   local option="$1"
   local prefix=""
@@ -55,6 +57,7 @@ alt_touchpad_cmt_config_desc() {
   done
 }
 
+# Function to register alternative touchpad configuration options
 register_alt_touchpad_cmt_options() {
   WarnMsg "Reboot or restart UI to apply the changes."
   for i in {0..4}; do
@@ -63,6 +66,7 @@ register_alt_touchpad_cmt_options() {
   done
 }
 
+# Function to show the alternative touchpad CMT menu
 alt_touchpad_cmt_show_menu() {
   register_alt_touchpad_cmt_options
 }

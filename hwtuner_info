@@ -1,3 +1,4 @@
 #!/bin/bash
 
+# Execute the hwtuner script with the --info flag and suppress error output
 /usr/share/hwtuner-script/hwtuner --info 2>/dev/null

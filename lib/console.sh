@@ -1,13 +1,12 @@
 #!/bin/bash
-# Copyright 2021 The JemaOS Authors. All rights reserved.
+# Copyright 2025 Jema Technology. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
-# Author: Yang Tsao<yang@jemaos.io>
 
 declare -g _APP_NAME="Default App Name"
 declare -ag _APP_VERSION=( 1 0 0 )
 declare -ag _CONSOLE_STACK
-# the index numbers are hotkeys and the command include function name and parameters
+# The index numbers are hotkeys, and the command includes function name and parameters
 declare -ag _NUMERICAL_HOTKEYS
 declare -ag _SAVED_COMMANDS
 declare -ag _SAVED_COMMANDS_DESCRIPTION
@@ -25,11 +24,11 @@ declare -Ag _LETTER_HOTKEYS=(
 show_hotkey() {
   local key=$1
   local key_len=${#key}
-  local msg="$(echo $2|sed 's/_/ /g')"
+  local msg="$(echo $2 | sed 's/_/ /g')"
   local i
-  for i in `seq 0 $((${#msg} -1))`; do
+  for i in `seq 0 $((${#msg} - 1))`; do
     if [ "${msg:$i:$key_len}" == "$key" ]; then
-      printf "($_WHITE$key$_NC)${msg:$((i+1))}"
+      printf "($_WHITE$key$_NC)${msg:$((i + 1))}"
       break
     else
       printf "${msg:$i:1}"

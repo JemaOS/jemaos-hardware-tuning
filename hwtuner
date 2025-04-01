@@ -1,31 +1,38 @@
 #!/bin/bash
-# Copyright 2021 The JemaOS Authors. All rights reserved.
+# Copyright 2025 Jema Technology. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
-# Author: Yang Tsao<yang@jemaos.io>
 
 declare RealPath=$0
+
+# Resolve the real path if the script is a symbolic link
 if [ -h $0 ]; then
   RealPath=$(readlink $RealPath)
 fi
+
+# Source the import library
 source $(dirname $RealPath)/lib/importlib.sh
 
+# Enable debug mode if the production environment is set to debug
 if [ "$production" == "debug" ]; then
   DEBUG_MODE=true
 fi
 
+# Disable color output if the --info flag is provided
 if [[ "$1" = "--info" ]]; then
   COLOR="false"
 fi
 
+# Import necessary libraries
 import_libs format_color array_util console
-
 import_libs root
 
+# Function to display the main help message
 root_show_help() {
   echo "main help"
 }
 
+# Function to retrieve the version suffix from a file
 version_suffix() {
   local f=""
   f="$(dirname "$RealPath")/.version_suffix"
@@ -36,6 +43,7 @@ version_suffix() {
   fi
 }
 
+# Main function to initialize the application
 main() {
   set_appname "JemaOS Hardware Tuner"
   set_appversion 0 0 1 "$(version_suffix)"
@@ -46,4 +54,5 @@ main() {
   register_console root
 }
 
+# Execute the main function with all provided arguments
 main $@

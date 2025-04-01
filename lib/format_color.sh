@@ -1,8 +1,7 @@
 #!/bin/base
-# Copyright 2021 The JemaOS Authors. All rights reserved.
+# Copyright 2025 Jema Technology. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
-# Author: Yang Tsao<yang@jemaos.io>
 
 if [[ ! "$COLOR" = "false" ]]; then
   declare -g _GREEN='\033[0;32m'

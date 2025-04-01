@@ -1,8 +1,7 @@
 #!/bin/bash
-# Copyright 2021 The JemaOS Authors. All rights reserved.
+# Copyright 2025 Jema Technology. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
-# Author: Yang Tsao<yang@jemaos.io>
 
 import_lib input_util
 
@@ -75,7 +74,7 @@ insert_driver_gesture_base() {
     return
   fi
   printf "
-#This section is create by a script, do not change it manually
+#This section is created by a script, do not change it manually
 Section \"InputClass\"
     Identifier      \"$devname Profile\"
     MatchProduct    \"$devname\"

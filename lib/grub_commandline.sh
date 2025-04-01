@@ -1,16 +1,17 @@
 #!/bin/bash
-# Copyright 2021 The JemaOS Authors. All rights reserved.
+# Copyright 2025 Jema Technology. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
-# Author: Yang Tsao<yang@jemaos.io>
 
-declare -g _RO_MODULE_PARAMS="moduleparams="
-declare -g _RO_MODULE_VAR="\$moduleparams"
-declare -g _RO_BLACKLIST="module_blacklist"
-declare -g GRUB_MNT="/tmp/grub_mnt"
-declare -g CURRENT_GRUB_FILE
-declare -g CURRENT_MODULE_PARAMS
+# Global variables for GRUB configuration
+declare -g _RO_MODULE_PARAMS="moduleparams="  # Key for module parameters in GRUB
+declare -g _RO_MODULE_VAR="\$moduleparams"   # Variable for module parameters
+declare -g _RO_BLACKLIST="module_blacklist"  # Key for module blacklist
+declare -g GRUB_MNT="/tmp/grub_mnt"         # Temporary mount point for GRUB
+declare -g CURRENT_GRUB_FILE                # Current GRUB configuration file
+declare -g CURRENT_MODULE_PARAMS            # Current module parameters
 
+# Function to retrieve module parameters from a GRUB configuration file
 get_module_params() {
   local grubfile=${1:-$CURRENT_GRUB_FILE}
   local module_params=$(cat $grubfile | grep $_RO_MODULE_PARAMS)
@@ -18,7 +19,7 @@ get_module_params() {
   echo ${module_params} | sed "s/\"//g"
 }
 
-# set module params value in gurb config file
+# Function to save module parameters to a GRUB configuration file
 save_module_params() {
   local grubfile=${1:-$CURRENT_GRUB_FILE}
   local module_params="${2:-$CURRENT_MODULE_PARAMS}"
@@ -26,7 +27,6 @@ save_module_params() {
     sudo cp $grubfile $grubfile.orig
   fi
   if [ -n "$(cat $grubfile | grep $_RO_MODULE_PARAMS)" ]; then
-    DbMsg "sed \"/$_RO_MODULE_PARAMS/  c $_RO_MODULE_PARAMS\\\"$module_params\\\"\"  $grubfile > $grubfile.new"
     sudo sh -c "sed \"/$_RO_MODULE_PARAMS/  c $_RO_MODULE_PARAMS\\\"$module_params\\\"\"  $grubfile > $grubfile.new"
   else
     sudo sh -c  "sed \"1 i $_RO_MODULE_PARAMS\\\"$module_params\\\"\" $grubfile > $grubfile.new"
@@ -38,6 +38,7 @@ save_module_params() {
   sudo mv $grubfile.new $grubfile
 }
 
+# Function to retrieve a specific parameter from module parameters
 get_param_from_module_params() {
   local module_params="$1"
   local param="$2"
@@ -49,14 +50,15 @@ get_param_from_module_params() {
   done
 }
 
+# Function to set a parameter in module parameters
 set_param_to_module_params() {
   local module_params="$1"
   local param="$2"
   local find_param=false
   local result=""
   for arg in $module_params; do
-    arg=$(echo $arg| xargs)
-    if [ -z "$arg" ];then
+    arg=$(echo $arg | xargs)
+    if [ -z "$arg" ]; then
       continue
     fi
     if [ "${arg%=*}" == "${param%=*}" ]; then
@@ -72,6 +74,7 @@ set_param_to_module_params() {
   echo ${result% }
 }
 
+# Function to unset a parameter from module parameters
 unset_param_to_module_params() {
   local module_params="${1:-$CURRENT_MODULE_PARAMS}"
   local param="$2"
@@ -84,19 +87,21 @@ unset_param_to_module_params() {
   echo ${result% }
 }
 
-#get module blacklist in module flags
+# Function to retrieve the blacklist from module parameters
 get_blacklist() {
   local module_params="${1:-$CURRENT_MODULE_PARAMS}"
   local blacklist=$(get_param_from_module_params "$module_params" $_RO_BLACKLIST)
   echo ${blacklist#*=}
 }
 
+# Function to set the blacklist in module parameters
 set_blacklist() {
   local module_params="$1"
   local blacklist="$2"
   set_param_to_module_params "$module_params" "$_RO_BLACKLIST=$blacklist"
 }
 
+# Function to check if a module is blocked
 is_module_blocked() {
   local blacklist=$1
   local name=$2
@@ -112,6 +117,7 @@ is_module_blocked() {
   $find_name
 }
 
+# Function to add a module to the blacklist
 set_blacklist_name() {
   local blacklist=$1
   local name=$2
@@ -132,6 +138,7 @@ set_blacklist_name() {
   fi
 }
 
+# Function to remove a module from the blacklist
 unset_blacklist_name() {
   local blacklist=$1
   local name=$2
@@ -146,10 +153,10 @@ unset_blacklist_name() {
   echo ${result%,}
 }
 
-#----- context support ------
+# Function to initialize the GRUB mount point
 init_grub_mnt() {
   [ -d $GRUB_MNT ] || mkdir $GRUB_MNT
-  if [ -n "$(cat /proc/cmdline |grep jemaos_dualboot)" ]; then
+  if [ -n "$(cat /proc/cmdline | grep jemaos_dualboot)" ]; then
     local dualboot_part=$(sudo cgpt find -l JEMAOS-DUAL-BOOT)
     dualboot_part=$(udevadm info -q path $dualboot_part)
     dualboot_part=$(dirname $dualboot_part)
@@ -163,18 +170,19 @@ init_grub_mnt() {
     CURRENT_GRUB_FILE=$GRUB_MNT/efi/boot/grub.cfg
   fi
   CURRENT_MODULE_PARAMS="$(get_module_params)"
-  DbMsg CURRENT_MODULE_PARAMS:$CURRENT_MODULE_PARAMS
 }
 
+# Function to release the GRUB mount point
 release_grub_mnt() {
   local params=$(get_module_params $CURRENT_GRUB_FILE)
   if [ "${CURRENT_MODULE_PARAMS}" != "$params" ]; then
     save_module_params "$CURRENT_GRUB_FILE" "$CURRENT_MODULE_PARAMS"
-    WarnMsg "The kernel module configration has been changed, reboot to apply the change."
+    WarnMsg "The kernel module configuration has been changed, reboot to apply the change."
   fi
   sudo umount $GRUB_MNT 
 }
 
+# Function to block a module
 block_module() {
   local modname=$1
   local bl=$(get_blacklist "${CURRENT_MODULE_PARAMS}")
@@ -182,22 +190,26 @@ block_module() {
   CURRENT_MODULE_PARAMS="$(set_blacklist "${CURRENT_MODULE_PARAMS}" "$bl")"
 }
 
+# Function to unblock a module
 unblock_module() {
   local modname=$1
   local bl=$(unset_blacklist_name "$(get_blacklist "${CURRENT_MODULE_PARAMS}")" $modname)
   CURRENT_MODULE_PARAMS="$(set_blacklist "${CURRENT_MODULE_PARAMS}" "$bl")"
 }
 
+# Function to set a module parameter
 set_module_parameter() {
   local param="$1"
   CURRENT_MODULE_PARAMS="$(set_param_to_module_params "$CURRENT_MODULE_PARAMS" "$param")"
 }
 
+# Function to unset a module parameter
 unset_module_parameter() {
   local param="$1"
   CURRENT_MODULE_PARAMS="$(unset_param_to_module_params "$CURRENT_MODULE_PARAMS" "$param")"
 }
 
+# Function to check if a module is blocked
 is_blocked_module() {
   local search_module="$1"
   local bl=$(get_blacklist "${CURRENT_MODULE_PARAMS}")

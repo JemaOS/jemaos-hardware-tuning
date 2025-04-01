@@ -1,9 +1,8 @@
 #!/bin/bash
 
-# Copyright 2022 The JemaOS Authors. All rights reserved.
+# Copyright 2025 The Jema Technology. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
-# Author: fangzhou@jemaos.io
 
 declare -rg _ALT_TOUCHPAD_CMT_CONF="/mnt/stateful_partition/unencrypted/gesture/55-alt-touchpad-cmt.conf"
 
